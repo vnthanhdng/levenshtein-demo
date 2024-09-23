@@ -27,7 +27,6 @@ Before running the application, ensure you have the following installed:
 
 ```bash
 git clone https://github.com/vnthanhdng/levenshtein-demo.git
-cd levenshtein-demo
 ```
 
 ### 2. Install dependencies
