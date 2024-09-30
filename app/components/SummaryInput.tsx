@@ -9,7 +9,7 @@ export default function SummaryComparison() {
   const [revisedSummary, setRevisedSummary] = useState("");
   const [levenshteinDistance, setLevenshteinDistance] = useState(0);
   const [progress, setProgress] = useState(0);
-  const [submitted, setSubmitted] = useState(false);
+  // const [submitted, setSubmitted] = useState(false);
   const [isFirstSubmission, setIsFirstSubmission] = useState(true);
 
   const handleRevisedChange = (e: { target: { value: string } }) => {
@@ -19,12 +19,13 @@ export default function SummaryComparison() {
 
   useEffect(() => {
     // Calculate Levenshtein distance between original and revised summary
-    if (revisedSummary.length > 0 && !isFirstSubmission) {
-      const distance = levenshtein(originalSummary, revisedSummary);
+    if (revisedSummary.trim().length > 0 && !isFirstSubmission) {
+      
+      const distance = levenshtein(originalSummary.trim(), revisedSummary.trim());
       setLevenshteinDistance(distance);
 
       // Calculate the percentage difference based on the string lengths
-      const maxLength = Math.max(originalSummary.length, revisedSummary.length);
+      const maxLength = Math.max(originalSummary.trim().length, revisedSummary.trim().length);
       const percentageDiff = maxLength
         ? Math.round((distance / maxLength) * 100)
         : 0;
@@ -36,15 +37,15 @@ export default function SummaryComparison() {
   }, [revisedSummary, originalSummary, isFirstSubmission]);
 
   const handleSubmit = () => {
-    setSubmitted(true); // Mark as submitted so progress bar appears
+    // setSubmitted(true); // Mark as submitted so progress bar appears
 
     if (isFirstSubmission) {
       // If it's the first submission, allow the user to submit even if progress is 0
-      setOriginalSummary(revisedSummary);
+      setOriginalSummary(revisedSummary.trim());
       setIsFirstSubmission(false); 
     } else if (progress >= 20) {
       // For subsequent submissions, use the progress logic
-      setOriginalSummary(revisedSummary);
+      setOriginalSummary(revisedSummary.trim());
     }
   };
 
@@ -59,7 +60,7 @@ export default function SummaryComparison() {
         className="summary-textarea"
       />
 
-{(submitted || progress > 0 || !isFirstSubmission) && (
+{(!isFirstSubmission) && (
         <>
           <ProgressBar progress={progress} minimum={20} />
           <div className="progress-percentage">Difference: {progress}%</div>

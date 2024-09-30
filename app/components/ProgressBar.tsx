@@ -9,9 +9,9 @@ export default class ProgressBar extends React.Component<ProgressBarProps> {
   render() {
     const { progress, minimum } = this.props;
 
-    if (progress === 0) {
-      return null;
-    }
+    // if (progress === 0) {
+    //   return null;
+    // }
 
     const progressBarColor = progress >= minimum ? '#4caf50' : '#ff9800'; 
 
