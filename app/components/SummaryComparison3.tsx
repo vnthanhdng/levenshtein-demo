@@ -1,16 +1,15 @@
 "use client";
 import { useState, useEffect } from "react";
 import levenshtein from "js-levenshtein";
-import ProgressBar from "./ProgressBar";
 
 export default function SummaryComparison() {
-  // Original summary that will be compared against
   const [originalSummary, setOriginalSummary] = useState("");
   const [revisedSummary, setRevisedSummary] = useState("");
   const [levenshteinDistance, setLevenshteinDistance] = useState(0);
   const [progress, setProgress] = useState(0);
-  // const [submitted, setSubmitted] = useState(false);
+  const maxDistance = 60; 
   const [isFirstSubmission, setIsFirstSubmission] = useState(true);
+
 
   const handleRevisedChange = (e: { target: { value: string } }) => {
     const input = e.target.value;
@@ -18,18 +17,14 @@ export default function SummaryComparison() {
   };
 
   useEffect(() => {
-    // Calculate Levenshtein distance between original and revised summary
     if (revisedSummary.trim().length > 0 && !isFirstSubmission) {
-      
       const distance = levenshtein(originalSummary.trim(), revisedSummary.trim());
       setLevenshteinDistance(distance);
 
-      // Calculate the percentage difference based on the string lengths
-      const maxLength = Math.max(originalSummary.trim().length, revisedSummary.trim().length);
-      const percentageDiff = maxLength
-        ? Math.round((distance / maxLength) * 100)
-        : 0;
-      setProgress(percentageDiff);
+      // Calculate the progress percentage based on Levenshtein distance
+      const percentage = Math.min(Math.round((distance / maxDistance) * 100), 100);
+      
+      setProgress(percentage);
     } else {
       setLevenshteinDistance(0);
       setProgress(0);
@@ -37,13 +32,11 @@ export default function SummaryComparison() {
   }, [revisedSummary, originalSummary, isFirstSubmission]);
 
   const handleSubmit = () => {
-    // setSubmitted(true); // Mark as submitted so progress bar appears
-
     if (isFirstSubmission) {
       // If it's the first submission, allow the user to submit even if progress is 0
       setOriginalSummary(revisedSummary.trim());
       setIsFirstSubmission(false); 
-    } else if (progress >= 20) {
+    } else if (levenshteinDistance >= 60) {
       // For subsequent submissions, use the progress logic
       setOriginalSummary(revisedSummary.trim());
     }
@@ -51,21 +44,17 @@ export default function SummaryComparison() {
 
   return (
     <div className="summary-container">
-      <h2>Write your revised summary</h2>
+      <h2>Progress bar wrapping text area after first failed submission</h2>
 
       <textarea
         value={revisedSummary}
         onChange={handleRevisedChange}
         placeholder="Write your revised summary here"
         className="summary-textarea"
+        style={{
+          "--progress": `${progress}%`
+        } as React.CSSProperties}
       />
-
-{(!isFirstSubmission) && (
-        <>
-          <ProgressBar progress={progress} minimum={20} />
-          <div className="progress-percentage">Difference: {progress}%</div>
-        </>
-      )}
 
       <div className="levenshtein-distance">
         Levenshtein Distance: {levenshteinDistance}
@@ -73,7 +62,7 @@ export default function SummaryComparison() {
 
       <button
         onClick={handleSubmit}
-        disabled={!isFirstSubmission && progress < 20} 
+        disabled={!isFirstSubmission && levenshteinDistance < 60}
         className="submit-button"
       >
         Submit
@@ -81,38 +70,54 @@ export default function SummaryComparison() {
 
       <style jsx>{`
         .summary-container {
-          width: 80%;
+          width: 60%;
           margin: 20px auto;
         }
+
         .summary-textarea {
           width: 100%;
           height: 150px;
           padding: 10px;
           font-size: 16px;
-          border: 1px solid #ccc;
-          border-radius: 4px;
-          color: #1e1e1e;
+          border: 0 solid #1e1e1e;
+          position: relative;
+          border-image: linear-gradient(
+            to top,
+            #228B22 0,
+            #228B22 calc(var(--progress)),
+            transparent calc(var(--progress)),
+            transparent calc(var(--progress)),
+            transparent calc(var(--progress))
+          );
+          border-image-slice: 1;
+          border-width: 5px;
+          transition: border-image 0.5s ease;
         }
+
+        .progress-percentage {
+          margin-top: 10px;
+          font-size: 14px;
+          color: #555;
+        }
+
         .levenshtein-distance {
           margin-top: 10px;
           font-size: 14px;
           color: #555;
         }
+
         .submit-button {
           margin-top: 20px;
           padding: 10px 20px;
-          background-color: ${progress >= 20 || isFirstSubmission
-            ? "#0070f3"
-            : "#ccc"};
+          background-color: ${levenshteinDistance >= 60 || isFirstSubmission ? "#0070f3" : "#ccc"};
           color: white;
           border: none;
           border-radius: 4px;
           cursor: pointer;
         }
+
         .submit-button:hover {
-          background-color: ${progress >= 20 || isFirstSubmission
-            ? "#005bb5"
-            : "#ccc"};
+          background-color: ${levenshteinDistance >= 60 || isFirstSubmission ? "#005bb5" : "#ccc"};
         }
       `}</style>
     </div>

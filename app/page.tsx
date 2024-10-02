@@ -1,6 +1,12 @@
 
-import SummaryInput from "./components/SummaryInput";
+import SummaryInput from "./components/SummaryComparison1";
+import SummaryComparison from "./components/SummaryComparison3";
+import SummaryComparison2 from "./components/SummaryComparison2";
 
 export default function Home() {
-  return <SummaryInput></SummaryInput>
+  return <div>
+    <SummaryInput/>
+    <SummaryComparison2/>
+    <SummaryComparison/>
+  </div>
 }

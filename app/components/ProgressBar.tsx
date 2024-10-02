@@ -2,27 +2,26 @@ import React from 'react';
 
 interface ProgressBarProps {
   progress: number;
-  minimum: number;
 }
 
 export default class ProgressBar extends React.Component<ProgressBarProps> {
   render() {
-    const { progress, minimum } = this.props;
+    const { progress} = this.props;
 
     // if (progress === 0) {
     //   return null;
     // }
 
-    const progressBarColor = progress >= minimum ? '#4caf50' : '#ff9800'; 
+    const progressBarColor = progress >= 50 ? '#4caf50' : '#ff9800'; 
 
     
     return (
       <div className="progress-container">
-        <div className="minimum-bar" style={{ left: `${minimum}%` }}></div>
+      
         <div className="progress-bar" style={{ width: `${progress}%`, background: progressBarColor }}></div>
         <style jsx>{`
           .progress-container {
-            width: 100%;
+            width: 50%;
             height: 20px;
             position: relative;
             background-color: #e0e0df;
